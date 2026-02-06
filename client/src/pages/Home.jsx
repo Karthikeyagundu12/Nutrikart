@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import Hero from '../components/Hero';
 import RestaurantCard from '../components/RestaurantCard';
-import Filters from '../components/Filters';
+import Filters from '../components/Filters'; // Keeping the cuisine filters? User might want replacement. Let's keep both or replace? Screenshot implied top filters. Let's keep existing and add new below or above. User said "i need filters... in main page also".
+// Actually, the screenshot looks like it REPLACES the old horizontal filters. But let's add it below Hero.
+import DishFilters from '../components/DishFilters';
 import { getRestaurants } from '../services/api';
 import './Home.css';
 
@@ -12,13 +14,17 @@ function Home({ addToCart }) {
     const [error, setError] = useState(null);
     const [activeCategory, setActiveCategory] = useState('all');
 
+    // New Filters State
+    const [activeSort, setActiveSort] = useState('default');
+    const [activeNutritionFilter, setActiveNutritionFilter] = useState('all');
+
     useEffect(() => {
         fetchRestaurants();
     }, []);
 
     useEffect(() => {
-        filterRestaurants(activeCategory);
-    }, [restaurants, activeCategory]);
+        applyFilters();
+    }, [restaurants, activeCategory, activeSort, activeNutritionFilter]); // Run when any filter changes
 
     const fetchRestaurants = async () => {
         try {
@@ -40,34 +46,88 @@ function Home({ addToCart }) {
             return;
         }
 
+        // Search logic remains simple for now
         const filtered = restaurants.filter(restaurant =>
             restaurant.name.toLowerCase().includes(query.toLowerCase()) ||
             restaurant.cuisineType.toLowerCase().includes(query.toLowerCase()) ||
             restaurant.description.toLowerCase().includes(query.toLowerCase())
         );
         setFilteredRestaurants(filtered);
-        setActiveCategory('custom'); // Reset specific category on search
+        setActiveCategory('custom');
     };
 
     const handleFilterChange = (category) => {
         setActiveCategory(category);
     };
 
-    const filterRestaurants = (category) => {
-        if (category === 'all' || category === 'custom') {
-            if (category === 'all') setFilteredRestaurants(restaurants);
-            return;
+    const applyFilters = () => {
+        let filtered = [...restaurants];
+
+        // 1. Cuisine Category Filter
+        if (activeCategory !== 'all' && activeCategory !== 'custom') {
+            filtered = filtered.filter(restaurant =>
+                restaurant.cuisineType.toLowerCase().includes(activeCategory.toLowerCase()) ||
+                (activeCategory === 'Fast Food' && (restaurant.cuisineType.includes('Burger') || restaurant.cuisineType.includes('Pizza')))
+            );
         }
 
-        // This is a simple filter based on cuisine type being present in the string
-        // ideally the backend would have structured categories
-        const filtered = restaurants.filter(restaurant =>
-            restaurant.cuisineType.toLowerCase().includes(category.toLowerCase()) ||
-            // Also check if any food item in the restaurant matches? No, that's too complex for now.
-            // Let's assume restaurant cuisineType covers it.
-            // Additional logic for "Fast Food" vs "Burger" etc can be added here
-            (category === 'Fast Food' && (restaurant.cuisineType.includes('Burger') || restaurant.cuisineType.includes('Pizza')))
-        );
+        // Helper for safe parsing
+        const getVal = (val, defaultVal = 0) => {
+            if (typeof val === 'number') return val;
+            if (typeof val === 'string') return parseFloat(val.replace(/[^\d.]/g, '')) || defaultVal;
+            return defaultVal;
+        };
+
+        // 2. Nutrition Filter (Filter restaurants that HAVE matching items)
+        if (activeNutritionFilter !== 'all') {
+            filtered = filtered.filter(restaurant => {
+                const items = restaurant.foodItems || [];
+                // Check if ANY item in this restaurant matches the criteria
+                return items.some(item => {
+                    const nutrients = item.nutrition || {};
+                    // Use safe parsing
+                    const cals = getVal(nutrients.calories, 999);
+                    const protein = getVal(nutrients.protein, 0);
+                    const carbs = getVal(nutrients.carbs, 999);
+                    const fat = getVal(nutrients.fat, 999);
+
+                    switch (activeNutritionFilter) {
+                        case 'low_cal': return cals < 400;
+                        case 'high_protein': return protein >= 20;
+                        case 'low_carb': return carbs < 30;
+                        case 'low_fat': return fat < 15;
+                        default: return true;
+                    }
+                });
+            });
+        }
+
+        // 3. Sort (By Price? Restaurants don't have a single price. Maybe avg price?)
+        // Let's implement a simple "Cheapest item logic" for the restaurant sort?
+        if (activeSort !== 'default' && activeSort !== 'relevance') {
+            filtered.sort((a, b) => {
+                if (activeSort === 'rating') {
+                    return (b.rating || 0) - (a.rating || 0);
+                }
+
+                if (activeSort === 'delivery_time') {
+                    return (parseFloat(a.deliveryTime) || 999) - (parseFloat(b.deliveryTime) || 999);
+                }
+
+                // Get min price of each restaurant
+                const getMinPrice = (r) => {
+                    if (!r.foodItems || r.foodItems.length === 0) return 9999;
+                    return Math.min(...r.foodItems.map(i => i.price));
+                };
+                const priceA = getMinPrice(a);
+                const priceB = getMinPrice(b);
+
+                if (activeSort === 'price_low') return priceA - priceB;
+                if (activeSort === 'price_high') return priceB - priceA;
+                return 0;
+            });
+        }
+
         setFilteredRestaurants(filtered);
     };
 
@@ -75,7 +135,9 @@ function Home({ addToCart }) {
         <div className="home">
             <Hero onSearch={handleSearch} />
 
-            <Filters activeFilter={activeCategory} onFilterChange={handleFilterChange} />
+            <div className="container">
+                <Filters activeFilter={activeCategory} onFilterChange={handleFilterChange} />
+            </div>
 
             <section className="restaurants-section">
                 <div className="container">
@@ -83,9 +145,12 @@ function Home({ addToCart }) {
                         <h2 className="section-title">
                             {activeCategory === 'all' ? '🍽️ Popular Restaurants' : `🍽️ ${activeCategory} Restaurants`}
                         </h2>
-                        <div className="sort-options">
-                            {/* Future: Add Sort By functionality */}
-                        </div>
+
+                        {/* New Nutrition Filters - "In a corner" (Top Right of section) */}
+                        <DishFilters
+                            onFilterChange={setActiveNutritionFilter}
+                            onSortChange={setActiveSort}
+                        />
                     </div>
 
                     {loading && (
@@ -104,7 +169,7 @@ function Home({ addToCart }) {
 
                     {!loading && !error && filteredRestaurants.length === 0 && (
                         <div className="no-results">
-                            <p>No restaurants found. Try a different search.</p>
+                            <p>No restaurants found matching your criteria.</p>
                         </div>
                     )}
 

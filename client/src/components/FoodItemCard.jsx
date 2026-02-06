@@ -1,31 +1,36 @@
 import './FoodItemCard.css';
 
-function FoodItemCard({ foodItem, onAddToCart, onViewNutrition, quantity = 0, onUpdateQuantity }) {
+function FoodItemCard({ foodItem, onAddToCart, onViewNutrition, quantity = 0, onUpdateQuantity, restaurantName }) {
     // Determine if it's veg or non-veg randomly for now (or from data if available)
-    // Usually this would come from the backend. Let's assume description or name gives a hint, otherwise random
-    const isVeg = !['chicken', 'beef', 'pork', 'lamb', 'fish', 'egg', 'meat'].some(
+    const isVeg = !['chicken', 'beef', 'pork', 'lamb', 'fish', 'egg', 'meat', 'prawn'].some(
         keyword => foodItem.name.toLowerCase().includes(keyword) ||
             foodItem.description.toLowerCase().includes(keyword)
     );
 
     return (
-        <div className="food-item-card">
+        <div className="food-item-card" onClick={() => onViewNutrition(foodItem)}>
             <div className="food-info">
-                <div className={`veg-indicator ${isVeg ? 'veg' : 'non-veg'}`}>
-                    <div className="dot"></div>
+                <div className="food-header">
+                    <h3 className="food-name">{foodItem.name}</h3>
+                    <div className={`veg-indicator ${isVeg ? 'veg' : 'non-veg'}`}>
+                        <div className="dot"></div>
+                    </div>
                 </div>
 
-                <h3 className="food-name">{foodItem.name}</h3>
+                {restaurantName && <div className="restaurant-sub">{restaurantName}</div>}
+
+                <div className="nutrition-info-block">
+                    <div className="nutri-stat cal">
+                        <span className="label">Cal</span>
+                        <span className="value">{foodItem.nutrition?.calories || 250}</span>
+                    </div>
+                    <div className="nutri-stat protein">
+                        <span className="label">Protein</span>
+                        <span className="value">{foodItem.nutrition?.protein || '5g'}</span>
+                    </div>
+                </div>
+
                 <div className="food-price">₹{foodItem.price}</div>
-
-                <p className="food-description">{foodItem.description}</p>
-
-                <div className="nutrition-tag" onClick={() => onViewNutrition(foodItem)}>
-                    <span className="calories-badge">
-                        🔥 {foodItem.nutrition?.calories || 250} cal
-                    </span>
-                    <span className="view-more">View info ›</span>
-                </div>
             </div>
 
             <div className="food-image-wrapper">

@@ -7,6 +7,8 @@ import Checkout from './pages/Checkout';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import MyOrders from './pages/MyOrders';
+import VendorPortal from './pages/VendorPortal';
+import VendorDashboard from './pages/VendorDashboard';
 import Cart from './components/Cart';
 import Footer from './components/Footer';
 
@@ -118,6 +120,8 @@ function App() {
                     <Route path="/checkout" element={
                         user ? <Checkout cart={cart} getTotalAmount={getTotalAmount} clearCart={clearCart} user={user} /> : <Navigate to="/login" />
                     } />
+                    <Route path="/vendor" element={<VendorPortal />} />
+                    <Route path="/vendor/dashboard" element={<VendorDashboard />} />
                 </Routes>
             </div>
 

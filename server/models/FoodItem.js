@@ -22,12 +22,38 @@ const foodItemSchema = new mongoose.Schema({
   category: {
     type: String,
     required: true,
-    enum: ['appetizer', 'main', 'dessert', 'beverage', 'snack', 'side']
+    enum: ['appetizer', 'main', 'dessert', 'beverage', 'snack', 'side', 'starter']
   },
+
+  // Mandatory quantity/portion size
+  portionSize: {
+    type: String,
+    required: true // e.g., "250ml", "1 plate", "200g"
+  },
+
+  // Availability
+  availabilityStatus: {
+    type: String,
+    enum: ['available', 'unavailable', 'out_of_stock'],
+    default: 'available'
+  },
+
   spoonacularId: {
     type: Number,
     required: false
   },
+
+  // Weight for nutrition calculation
+  weight: {
+    type: Number, // in grams
+    required: false
+  },
+
+  isVeg: {
+    type: Boolean,
+    default: true
+  },
+
   nutrition: {
     calories: { type: Number, default: 0 },
     protein: { type: Number, default: 0 },

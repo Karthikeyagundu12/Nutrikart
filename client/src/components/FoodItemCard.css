@@ -1,0 +1,219 @@
+.food-item-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 2px solid var(--background-light);
+    /* Swiggy style separator */
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.food-item-card:hover {
+    background: #fafafa;
+}
+
+.food-info {
+    flex: 1;
+    padding-right: 16px;
+    display: flex;
+    flex-direction: column;
+}
+
+.veg-indicator {
+    width: 16px;
+    height: 16px;
+    border: 2px solid;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+    border-radius: 4px;
+}
+
+.veg-indicator .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: currentColor;
+}
+
+.veg-indicator.veg {
+    color: var(--success);
+    border-color: var(--success);
+}
+
+.veg-indicator.non-veg {
+    color: var(--secondary);
+    border-color: var(--secondary);
+}
+
+.food-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.food-price {
+    font-size: 1rem;
+    color: var(--text-primary);
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.food-description {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    line-height: 1.5;
+    margin-bottom: 12px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    max-width: 90%;
+}
+
+.nutrition-tag {
+    margin-top: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.nutrition-tag:hover {
+    opacity: 0.8;
+}
+
+.calories-badge {
+    font-size: 0.75rem;
+    color: var(--warning);
+    font-weight: 700;
+    background: #FFF8E1;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.view-more {
+    font-size: 0.75rem;
+    color: var(--text-light);
+    font-weight: 600;
+}
+
+.food-image-wrapper {
+    width: 118px;
+    height: 118px;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.food-image {
+    width: 100%;
+    height: 96px;
+    /* Leave space for button */
+    object-fit: cover;
+    border-radius: 12px;
+}
+
+.add-btn-container {
+    position: absolute;
+    bottom: 8px;
+    /* Overlaying the image partially */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90px;
+}
+
+.add-btn {
+    width: 100%;
+    background: white;
+    color: var(--success);
+    border: 1px solid var(--border);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-weight: 800;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s;
+    text-transform: uppercase;
+}
+
+.add-btn:hover {
+    background: #f8f8f8;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: scale(1.02);
+}
+
+.add-btn .plus {
+    font-size: 1.2rem;
+    line-height: 0.8;
+}
+
+@media (max-width: 480px) {
+    .food-item-card {
+        padding: 12px;
+    }
+
+    .food-image-wrapper {
+        width: 100px;
+        height: 100px;
+    }
+
+    .food-name {
+        font-size: 1rem;
+    }
+}
+
+.quantity-controls {
+    width: 100%;
+    background: white;
+    color: var(--success);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-weight: 800;
+    font-size: 0.9rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    height: 38px;
+    overflow: hidden;
+}
+
+.qty-btn {
+    background: none;
+    border: none;
+    color: var(--success);
+    font-weight: 800;
+    font-size: 1.2rem;
+    cursor: pointer;
+    width: 30px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+    line-height: 1;
+}
+
+.qty-btn:hover {
+    background: #f0fdf4;
+}
+
+.qty-value {
+    color: var(--success);
+    font-weight: 800;
+    font-size: 0.95rem;
+}
+
+.add-btn {
+    height: 38px;
+}

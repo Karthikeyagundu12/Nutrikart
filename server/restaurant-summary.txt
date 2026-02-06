@@ -1,0 +1,12 @@
+
+=== RESTAURANT MENU SUMMARY ===
+
+Cafe Niloufer (Cafe): 8 items
+Paradise Biryani (Hyderabadi): 9 items
+Pizza Paradise (Italian): 10 items
+Pista House (Hyderabadi): 7 items
+Spice Garden (Indian): 10 items
+Dragon Wok (Chinese): 10 items
+Burger Hub (American): 10 items
+
+Total restaurants: 7

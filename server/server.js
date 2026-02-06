@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const supabase = require('./config/supabase');
+
 
 const restaurantRoutes = require('./routes/restaurants');
 const nutritionRoutes = require('./routes/nutrition');

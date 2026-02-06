@@ -35,6 +35,7 @@ app.use((err, req, res, next) => {
 });
 
 // MongoDB Atlas connection
+// MongoDB Atlas connection
 mongoose.connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
@@ -42,15 +43,17 @@ mongoose.connect(process.env.MONGODB_URI, {
     .then(() => {
         console.log('✅ Connected to MongoDB Atlas');
 
-        // Start server
-        app.listen(PORT, () => {
-            console.log(`🚀 Server is running on http://localhost:${PORT}`);
-            console.log(`📊 API Health: http://localhost:${PORT}/api/health`);
-        });
+        // Start server only if not in production lambda environment (or if called directly)
+        if (require.main === module) {
+            app.listen(PORT, () => {
+                console.log(`🚀 Server is running on http://localhost:${PORT}`);
+                console.log(`📊 API Health: http://localhost:${PORT}/api/health`);
+            });
+        }
     })
     .catch((error) => {
         console.error('❌ MongoDB connection error:', error);
-        console.error('Please check your MongoDB Atlas connection string in .env file');
-        process.exit(1);
     });
+
+module.exports = app;
 

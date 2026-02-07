@@ -60,13 +60,16 @@ function VendorDashboard() {
         description: '',
         price: '',
         category: 'main',
+        cuisineCategory: 'Indian',
         isVeg: true,
         portionSize: '',
+        ingredients: '',
         weight: '',
         calories: '',
         protein: '',
         carbs: '',
-        fats: ''
+        fats: '',
+        fiber: ''
     });
 
     useEffect(() => {
@@ -100,7 +103,7 @@ function VendorDashboard() {
         } catch (error) {
             console.error('Error checking status:', error);
             if (error.response?.status === 401) {
-                navigate('/vendor');
+                navigate('/login');
             }
         } finally {
             setLoading(false);
@@ -151,13 +154,16 @@ function VendorDashboard() {
                 description: '',
                 price: '',
                 category: 'main',
+                cuisineCategory: 'Indian',
                 isVeg: true,
                 portionSize: '',
+                ingredients: '',
                 weight: '',
                 calories: '',
                 protein: '',
                 carbs: '',
-                fats: ''
+                fats: '',
+                fiber: ''
             });
         } catch (error) {
             alert('Error: ' + (error.response?.data?.message || 'Failed to add food item'));
@@ -183,9 +189,9 @@ function VendorDashboard() {
     };
 
     const handleLogout = () => {
-        localStorage.removeItem('vendorToken');
-        localStorage.removeItem('vendorData');
-        navigate('/vendor');
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        navigate('/login');
     };
 
     if (loading) {
@@ -649,6 +655,29 @@ function VendorDashboard() {
                                     </select>
                                 </div>
                                 <div className="form-group">
+                                    <label>Cuisine Category *</label>
+                                    <select
+                                        value={foodForm.cuisineCategory}
+                                        onChange={(e) => setFoodForm({ ...foodForm, cuisineCategory: e.target.value })}
+                                        required
+                                    >
+                                        <option value="Indian">Indian</option>
+                                        <option value="Chinese">Chinese</option>
+                                        <option value="Fast Food">Fast Food</option>
+                                        <option value="Continental">Continental</option>
+                                        <option value="South Indian">South Indian</option>
+                                        <option value="North Indian">North Indian</option>
+                                        <option value="Italian">Italian</option>
+                                        <option value="Mexican">Mexican</option>
+                                        <option value="Beverages">Beverages</option>
+                                        <option value="Desserts">Desserts</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div className="form-row">
+                                <div className="form-group">
                                     <label>Type *</label>
                                     <select
                                         value={foodForm.isVeg}
@@ -659,9 +688,6 @@ function VendorDashboard() {
                                         <option value="false">Non-Veg</option>
                                     </select>
                                 </div>
-                            </div>
-
-                            <div className="form-row">
                                 <div className="form-group">
                                     <label>Price (₹) *</label>
                                     <input
@@ -673,17 +699,28 @@ function VendorDashboard() {
                                         placeholder="299"
                                     />
                                 </div>
-                                <div className="form-group">
-                                    <label>Portion Size / Quantity *</label>
-                                    <input
-                                        type="text"
-                                        value={foodForm.portionSize}
-                                        onChange={(e) => setFoodForm({ ...foodForm, portionSize: e.target.value })}
-                                        required
-                                        placeholder="e.g., 250ml, 1 plate, 200g"
-                                    />
-                                    <small>Mandatory: Specify serving size</small>
-                                </div>
+                            </div>
+
+                            <div className="form-group">
+                                <label>Portion Size / Quantity *</label>
+                                <input
+                                    type="text"
+                                    value={foodForm.portionSize}
+                                    onChange={(e) => setFoodForm({ ...foodForm, portionSize: e.target.value })}
+                                    required
+                                    placeholder="e.g., 250ml, 1 plate, 200g"
+                                />
+                                <small>Mandatory: Specify serving size</small>
+                            </div>
+
+                            <div className="form-group">
+                                <label>Ingredients (Optional)</label>
+                                <textarea
+                                    value={foodForm.ingredients}
+                                    onChange={(e) => setFoodForm({ ...foodForm, ingredients: e.target.value })}
+                                    placeholder="List main ingredients (optional)"
+                                    rows="2"
+                                />
                             </div>
 
                             <h3>📊 Nutritional Information (Optional)</h3>
@@ -728,12 +765,24 @@ function VendorDashboard() {
                                         placeholder="Optional"
                                     />
                                 </div>
+                            </div>
+
+                            <div className="form-row">
                                 <div className="form-group">
                                     <label>Fats (g)</label>
                                     <input
                                         type="number"
                                         value={foodForm.fats}
                                         onChange={(e) => setFoodForm({ ...foodForm, fats: e.target.value })}
+                                        placeholder="Optional"
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Fiber (g)</label>
+                                    <input
+                                        type="number"
+                                        value={foodForm.fiber}
+                                        onChange={(e) => setFoodForm({ ...foodForm, fiber: e.target.value })}
                                         placeholder="Optional"
                                     />
                                 </div>

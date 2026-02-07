@@ -8,21 +8,29 @@ const FoodItem = require('../models/FoodItem');
 const Order = require('../models/Order');
 
 // Middleware to verify vendor token
+// Middleware to verify vendor token - HARDENED
 const verifyVendorToken = (req, res, next) => {
     const token = req.headers.authorization?.split(' ')[1];
+
     if (!token) {
         return res.status(401).json({ message: 'No token provided' });
     }
 
     try {
-        const decoded = jwt.decode(token);
+        // 🔥 CRITICAL SECURITY FIX: verify signature instead of just decoding
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        // Strict role check
         if (decoded.role !== 'vendor') {
             return res.status(403).json({ message: 'Access denied. Vendor only.' });
         }
-        req.vendorId = decoded.id;
+
+        req.user = decoded; // Store full user info including role
+        req.vendorId = decoded.id; // Keep backward compatibility
         next();
     } catch (error) {
-        res.status(401).json({ message: 'Invalid token' });
+        console.error('Token verification failed:', error.message);
+        return res.status(401).json({ message: 'Invalid or expired token' });
     }
 };
 
@@ -220,7 +228,24 @@ router.get('/restaurants', verifyVendorToken, async (req, res) => {
 router.post('/restaurants/:restaurantId/foods', verifyVendorToken, async (req, res) => {
     try {
         const { restaurantId } = req.params;
-        const { name, description, price, image, category, isVeg, weight, portionSize, availabilityStatus } = req.body;
+        const {
+            name,
+            description,
+            price,
+            image,
+            category,
+            cuisineCategory,
+            isVeg,
+            weight,
+            portionSize,
+            ingredients,
+            availabilityStatus,
+            calories,
+            protein,
+            carbs,
+            fats,
+            fiber
+        } = req.body;
 
         // Verify restaurant belongs to vendor
         const restaurant = await Restaurant.findOne({
@@ -247,16 +272,27 @@ router.post('/restaurants/:restaurantId/foods', verifyVendorToken, async (req, r
             });
         }
 
+        // Build nutrition object (optional fields)
+        const nutrition = {};
+        if (calories) nutrition.calories = Number(calories);
+        if (protein) nutrition.protein = Number(protein);
+        if (carbs) nutrition.carbs = Number(carbs);
+        if (fats) nutrition.fats = Number(fats);
+        if (fiber) nutrition.fiber = Number(fiber);
+
         const foodItem = new FoodItem({
             name,
             description,
             price,
             image: image || 'https://via.placeholder.com/300x200?text=Food',
             category,
+            cuisineCategory: cuisineCategory || 'Other',
             isVeg: isVeg !== undefined ? isVeg : true,
             weight,
             portionSize,
-            availabilityStatus: availabilityStatus || 'available'
+            ingredients,
+            availabilityStatus: availabilityStatus || 'available',
+            nutrition: Object.keys(nutrition).length > 0 ? nutrition : undefined
         });
 
         await foodItem.save();

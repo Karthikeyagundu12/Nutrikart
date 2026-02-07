@@ -3,9 +3,9 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
-// Generate JWT token
-const generateToken = (userId) => {
-    return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
+// Generate JWT token with role
+const generateToken = (userId, role) => {
+    return jwt.sign({ id: userId, role: role }, process.env.JWT_SECRET, {
         expiresIn: '7d'
     });
 };
@@ -15,9 +15,19 @@ router.post('/register', async (req, res) => {
     try {
         const { name, email, password, phone, role } = req.body;
 
+        console.log('📝 Registration attempt:', { name, email, phone, role });
+
+        // Validate required fields
+        if (!name || !email || !password) {
+            return res.status(400).json({
+                message: 'Please provide name, email, and password'
+            });
+        }
+
         // Check if user already exists
         const existingUser = await User.findOne({ email });
         if (existingUser) {
+            console.log('❌ Email already exists:', email);
             return res.status(400).json({ message: 'Email already registered' });
         }
 
@@ -30,8 +40,10 @@ router.post('/register', async (req, res) => {
             role: role || 'customer'
         });
 
-        // Generate token
-        const token = generateToken(user._id);
+        console.log('✅ User created:', user._id, user.role);
+
+        // Generate token with role
+        const token = generateToken(user._id, user.role);
 
         res.status(201).json({
             message: 'Registration successful',
@@ -45,7 +57,11 @@ router.post('/register', async (req, res) => {
             }
         });
     } catch (error) {
-        res.status(500).json({ message: 'Registration failed', error: error.message });
+        console.error('❌ Registration error:', error);
+        res.status(500).json({
+            message: 'Registration failed',
+            error: error.message
+        });
     }
 });
 
@@ -76,8 +92,8 @@ router.post('/login', async (req, res) => {
             return res.status(401).json({ message: 'Invalid email or password' });
         }
 
-        // Generate token
-        const token = generateToken(user._id);
+        // Generate token with role
+        const token = generateToken(user._id, user.role);
 
         res.json({
             message: 'Login successful',
@@ -118,7 +134,8 @@ router.get('/me', async (req, res) => {
                 name: user.name,
                 email: user.email,
                 phone: user.phone,
-                address: user.address
+                address: user.address,
+                role: user.role
             }
         });
     } catch (error) {

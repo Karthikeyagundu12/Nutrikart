@@ -37,8 +37,19 @@ function Login({ onLogin }) {
                 onLogin(response.data.user);
             }
 
-            // Redirect to home
-            navigate('/');
+            // 🔥 ROLE-BASED REDIRECT
+            const userRole = response.data.user.role;
+
+            if (userRole === 'vendor') {
+                // Redirect vendors to their dashboard
+                navigate('/vendor/dashboard');
+            } else if (userRole === 'admin') {
+                // Redirect admins to admin panel (if exists)
+                navigate('/admin/dashboard');
+            } else {
+                // Redirect customers to home
+                navigate('/');
+            }
         } catch (err) {
             setError(err.response?.data?.message || 'Login failed. Please try again.');
         } finally {

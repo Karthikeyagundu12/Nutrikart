@@ -7,10 +7,11 @@ import Checkout from './pages/Checkout';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import MyOrders from './pages/MyOrders';
-import VendorPortal from './pages/VendorPortal';
 import VendorDashboard from './pages/VendorDashboard';
 import Cart from './components/Cart';
 import Footer from './components/Footer';
+import VendorRoute from './components/VendorRoute';
+import CustomerRoute from './components/CustomerRoute';
 
 function App() {
     const [cart, setCart] = useState([]);
@@ -106,22 +107,41 @@ function App() {
                     <Route path="/register" element={
                         user ? <Navigate to="/" /> : <Register onLogin={handleLogin} />
                     } />
-                    <Route path="/" element={<Home addToCart={addToCart} />} />
+                    <Route path="/" element={
+                        <CustomerRoute>
+                            <Home addToCart={addToCart} />
+                        </CustomerRoute>
+                    } />
                     <Route path="/restaurant/:id" element={
-                        <RestaurantDetail
-                            addToCart={addToCart}
-                            cart={cart}
-                            updateQuantity={updateQuantity}
-                        />
+                        <CustomerRoute>
+                            <RestaurantDetail
+                                addToCart={addToCart}
+                                cart={cart}
+                                updateQuantity={updateQuantity}
+                            />
+                        </CustomerRoute>
                     } />
                     <Route path="/orders" element={
-                        user ? <MyOrders user={user} /> : <Navigate to="/login" />
+                        user ? (
+                            <CustomerRoute>
+                                <MyOrders user={user} />
+                            </CustomerRoute>
+                        ) : <Navigate to="/login" />
                     } />
                     <Route path="/checkout" element={
-                        user ? <Checkout cart={cart} getTotalAmount={getTotalAmount} clearCart={clearCart} user={user} /> : <Navigate to="/login" />
+                        user ? (
+                            <CustomerRoute>
+                                <Checkout cart={cart} getTotalAmount={getTotalAmount} clearCart={clearCart} user={user} />
+                            </CustomerRoute>
+                        ) : <Navigate to="/login" />
                     } />
-                    <Route path="/vendor" element={<VendorPortal />} />
-                    <Route path="/vendor/dashboard" element={<VendorDashboard />} />
+
+                    {/* 🔥 VENDOR ROUTES - Protected by VendorRoute */}
+                    <Route path="/vendor/dashboard" element={
+                        <VendorRoute>
+                            <VendorDashboard />
+                        </VendorRoute>
+                    } />
                 </Routes>
             </div>
 

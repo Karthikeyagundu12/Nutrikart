@@ -7,13 +7,17 @@ function Header({ cartItemCount, cartTotal, onCartClick, user, onLogout }) {
         <header className="header">
             {/* ... container ... */}
             <div className="header-container">
-                <Link to="/" className="logo">
+                <Link to={user && user.role === 'vendor' ? "/vendor/dashboard" : "/"} className="logo">
                     <img src={logoImage} alt="Nutrikart Logo" className="logo-icon" />
                     <span className="logo-text">Nutrikart</span>
                 </Link>
 
                 <nav className="nav">
-                    <Link to="/" className="nav-link">Home</Link>
+                    {user && user.role === 'vendor' ? (
+                        <Link to="/vendor/dashboard" className="nav-link">Vendor Dashboard</Link>
+                    ) : (
+                        <Link to="/" className="nav-link">Home</Link>
+                    )}
 
                     {user ? (
                         <>

@@ -25,10 +25,23 @@ const foodItemSchema = new mongoose.Schema({
     enum: ['appetizer', 'main', 'dessert', 'beverage', 'snack', 'side', 'starter']
   },
 
+  // Cuisine category (Indian, Chinese, etc.)
+  cuisineCategory: {
+    type: String,
+    enum: ['Indian', 'Chinese', 'Fast Food', 'Continental', 'South Indian', 'North Indian', 'Italian', 'Mexican', 'Beverages', 'Desserts', 'Other'],
+    default: 'Other'
+  },
+
   // Mandatory quantity/portion size
   portionSize: {
     type: String,
     required: true // e.g., "250ml", "1 plate", "200g"
+  },
+
+  // Optional ingredients list
+  ingredients: {
+    type: String,
+    required: false
   },
 
   // Availability
